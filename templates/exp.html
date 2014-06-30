@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+    <head>
+        <title>jsPsych experiment</title>
+		
+		<script src="/static/lib/jquery-min.js" type="text/javascript"> </script>
+        <script src="/static/lib/underscore-min.js" type="text/javascript"> </script>
+        <script src="/static/lib/backbone-min.js" type="text/javascript"> </script>
+		
+        <script src="/static/js/jspsych/jspsych.js" type="text/javascript"></script>
+        <script src="/static/js/jspsych/plugins/jspsych-text.js" type="text/javascript"></script>
+        <script src="/static/js/jspsych/plugins/jspsych-single-stim.js" type="text/javascript"></script>
+		<script src="/static/js/jspsych/plugins/jspsych-call-function.js" type="text/javascript"></script>
+		
+        <script type="text/javascript">
+                // These fields provided by the psiTurk Server
+                var uniqueId = "{{ uniqueId }}";  // a unique string identifying the worker/task
+                var adServerLoc = "{{ adServerLoc }}"; // the location of your ad (so you can send user back at end of experiment)
+        </script>
+
+        <!-- utils.js and psiturk.js provide the basic psiturk functionality -->
+        <script src="/static/js/utils.js" type="text/javascript"> </script>
+        <script src="/static/js/psiturk.js" type="text/javascript"> </script>
+		
+        <link href="/static/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+    </head>
+    <body>
+        <div id='jspsych-target'></div>
+    </body>
+    <script>
+		
+		/* load psiturk */
+		var psiturk = PsiTurk(uniqueId, adServerLoc);
+    
+        /* text blocks */
+        
+        var welcome_block = {
+            type: "text",
+            text: "Welcome to the experiment."
+        };
+        
+        var instructions_block = {
+            type: "text",
+            text: "<p>In this experiment, a circle will appear in the center "+
+                "of the screen.</p><p>If the circle is <strong>blue</strong>, "+
+                "press the letter F on the keyboard as fast as you can.</p>"+
+                "<p>If the circle is <strong>orange</strong>, do not press "+
+                "any key.</p>"+
+                "<div class='left center-content'><img src='/static/images/blue.png'></img>"+
+                "<p class='small'><strong>Press the F key</strong></p></div>"+
+                "<div class='right center-content'><img src='/static/images/orange.png'></img>"+
+                "<p class='small'><strong>Do not press a key</strong></p></div>"+
+                "<p>Press enter to begin.</p>",
+            timing_post_trial: 2000
+        };
+		
+		/* block to let psiturk know that the instructions are over */
+		
+		var tell_psiturk_task_is_starting_block = {
+			type: 'call-function',
+			func: function() { psiturk.finishInstructions(); }
+		};
+        
+        /* stimulus block */
+        
+        var test_stimuli = ["/static/images/blue.png", "/static/images/orange.png"];
+        
+        var all_trials = jsPsych.randomization.repeat(test_stimuli, 2, false);
+        
+        var test_block = {
+            type: "single-stim",
+            stimuli: all_trials,
+            choices: ['F'],
+            timing_stim: 1500,
+            timing_response: 1500
+        };
+        
+        /* define experiment structure */
+        
+        var experiment_blocks = [];
+        
+        experiment_blocks.push(welcome_block);
+        
+        experiment_blocks.push(instructions_block);
+		
+		experiment_blocks.push(tell_psiturk_task_is_starting_block);
+        
+        experiment_blocks.push(test_block);
+        
+        /* start the experiment */
+        
+        jsPsych.init({
+            display_element: $('#jspsych-target'),
+            experiment_structure: experiment_blocks,
+            on_finish: function() {
+				psiturk.saveData();
+                psiturk.completeHIT();
+            },
+			on_data_update: function(data) {
+				psiturk.recordTrialData(data);
+			}
+        });
+        
+    </script>
+</html>
