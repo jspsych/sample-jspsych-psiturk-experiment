@@ -1,9 +1,10 @@
-// jspsych.js
-// 
-//	Josh de Leeuw 
-//	Percepts and Concepts Lab, Indiana University
-//
-//
+/**
+ * jspsych.js
+ * Josh de Leeuw
+ * 
+ * documentation: https://github.com/jodeleeuw/jsPsych/wiki
+ *
+ **/ 
 (function($) {
     jsPsych = (function() {
 
@@ -300,6 +301,21 @@
             saveTextToFile(data_string, filename);
         };
         
+        module.getTrialsOfType = function(trial_type){
+            var data = jsPsych.data();
+            
+            data = flatten(data);
+            
+            var trials = [];
+            for(var i = 0; i < data.length; i++){
+                if(data[i].trial_type == trial_type){
+                    trials.push(data[i]);
+                }
+            }
+            
+            return trials;
+        };
+        
         // private function to save text file on local drive
         function saveTextToFile(textstr, filename) {
             var blobToSave = new Blob([textstr], {
@@ -322,20 +338,6 @@
                 html: 'download file'
             }));
             $('#jspsych-download-as-text-link')[0].click();
-        }
-        
-        // private function to flatten nested arrays
-        function flatten(arr, out) {
-            out = (typeof out === 'undefined') ? [] : out;
-            for (var i = 0; i < arr.length; i++) {
-                if (Array.isArray(arr[i])) {
-                    flatten(arr[i], out);
-                }
-                else {
-                    out.push(arr[i]);
-                }
-            }
-            return out;
         }
         
         //
@@ -896,4 +898,20 @@
         return module;
     })();
     
+    // methods used in multiple modules
+    
+    // private function to flatten nested arrays
+    function flatten(arr, out) {
+        out = (typeof out === 'undefined') ? [] : out;
+        for (var i = 0; i < arr.length; i++) {
+            if (Array.isArray(arr[i])) {
+                flatten(arr[i], out);
+            }
+            else {
+                out.push(arr[i]);
+            }
+        }
+        return out;
+    }
+
 })(jQuery);
