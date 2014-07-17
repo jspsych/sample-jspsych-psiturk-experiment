@@ -131,7 +131,7 @@
             experiment_structure: experiment_blocks,
             on_finish: function() {
                 psiturk.saveData({
-                    success: psiturk.completeHIT();
+                    success: function() { psiturk.completeHIT(); }
                 });
             },
             on_data_update: function(data) {
