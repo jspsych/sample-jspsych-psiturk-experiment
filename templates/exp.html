@@ -130,8 +130,9 @@
             display_element: $('#jspsych-target'),
             experiment_structure: experiment_blocks,
             on_finish: function() {
-                psiturk.saveData();
-                psiturk.completeHIT();
+                psiturk.saveData({
+                    success: psiturk.completeHIT();
+                });
             },
             on_data_update: function(data) {
                 psiturk.recordTrialData(data);
