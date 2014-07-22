@@ -16,6 +16,7 @@
             // These fields provided by the psiTurk Server
             var uniqueId = "{{ uniqueId }}"; // a unique string identifying the worker/task
             var adServerLoc = "{{ adServerLoc }}"; // the location of your ad (so you can send user back at end of experiment)
+            var mode = "{{ mode }}"; // is this running live, sandbox, or in debug mode?
         </script>
         
         <!-- utils.js and psiturk.js provide the basic psiturk functionality -->
@@ -30,7 +31,7 @@
     </body>
     <script>
         /* load psiturk */
-        var psiturk = PsiTurk(uniqueId, adServerLoc);
+        var psiturk = new PsiTurk(uniqueId, adServerLoc, mode);
 
         /* text blocks */
 
